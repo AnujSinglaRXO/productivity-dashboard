@@ -1,0 +1,8 @@
+streamlit
+pickle
+uuid
+enum
+calendar
+pandas
+matplotlib
+plotly

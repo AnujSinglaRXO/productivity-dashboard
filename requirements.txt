@@ -1,6 +1,6 @@
 streamlit
 uuid
 enum-compat
-pandas
+pandas==1.5
 matplotlib
 plotly

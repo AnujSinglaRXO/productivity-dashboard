@@ -1,7 +1,6 @@
 streamlit
 uuid
 enum-compat
-calendar
 pandas
 matplotlib
 plotly

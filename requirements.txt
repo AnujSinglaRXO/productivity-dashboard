@@ -1,6 +1,6 @@
 streamlit
 uuid
-enum
+enum-compat
 calendar
 pandas
 matplotlib

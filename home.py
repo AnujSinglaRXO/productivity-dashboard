@@ -220,20 +220,20 @@ def generate_filter(filter_id, df):
         label_visibility="collapsed",
     )
 
-    if df[filter_param].dtype.name == "datetime64[ns]":
-        operator_options = FilterType.DATETIME
-    elif df[filter_param].dtype.name == "int64":
-        operator_options = FilterType.NUMERIC
-    else:
-        operator_options = FilterType.CATEGORICAL
+    # if df[filter_param].dtype.name == "datetime64[ns]":
+    #     operator_options = FilterType.DATETIME
+    # elif df[filter_param].dtype.name == "int64":
+    #     operator_options = FilterType.NUMERIC
+    # else:
+    #     operator_options = FilterType.CATEGORICAL
 
-    # match df[filter_param].dtype.name:
-    #     case "datetime64[ns]":
-    #         operator_options = FilterType.DATETIME
-    #     case "int64":
-    #         operator_options = FilterType.NUMERIC
-    #     case _:
-    #         operator_options = FilterType.CATEGORICAL
+    match df[filter_param].dtype.name:
+        case "datetime64[ns]":
+            operator_options = FilterType.DATETIME
+        case "int64":
+            operator_options = FilterType.NUMERIC
+        case _:
+            operator_options = FilterType.CATEGORICAL
 
     filter_operator = filter_cols[1].selectbox(
         "Operator",
@@ -242,56 +242,56 @@ def generate_filter(filter_id, df):
         label_visibility="collapsed",
     )
 
-    if operator_options == FilterType.NUMERIC:
-        filter_value = filter_cols[2].number_input(
-            "Value",
-            key=f"{filter_id}_value",
-            label_visibility="collapsed",
-            min_value=df[filter_param].min(),
-            max_value=df[filter_param].max(),
-        )
-    elif operator_options == FilterType.DATETIME:
-        filter_value = filter_cols[2].date_input(
-            "Value",
-            key=f"{filter_id}_value",
-            label_visibility="collapsed",
-            min_value=df[filter_param].min(),
-            max_value=df[filter_param].max(),
-            value=df[filter_param].max(),
-        )
-    else:
-        filter_value = filter_cols[2].multiselect(
-            "Value",
-            options=df[filter_param].unique(),
-            key=f"{filter_id}_value",
-            label_visibility="collapsed",
-        )
+    # if operator_options == FilterType.NUMERIC:
+    #     filter_value = filter_cols[2].number_input(
+    #         "Value",
+    #         key=f"{filter_id}_value",
+    #         label_visibility="collapsed",
+    #         min_value=df[filter_param].min(),
+    #         max_value=df[filter_param].max(),
+    #     )
+    # elif operator_options == FilterType.DATETIME:
+    #     filter_value = filter_cols[2].date_input(
+    #         "Value",
+    #         key=f"{filter_id}_value",
+    #         label_visibility="collapsed",
+    #         min_value=df[filter_param].min(),
+    #         max_value=df[filter_param].max(),
+    #         value=df[filter_param].min(),
+    #     )
+    # else:
+    #     filter_value = filter_cols[2].multiselect(
+    #         "Value",
+    #         options=df[filter_param].unique(),
+    #         key=f"{filter_id}_value",
+    #         label_visibility="collapsed",
+    #     )
 
-    # match operator_options:
-    #     case FilterType.CATEGORICAL:
-    #         filter_value = filter_cols[2].multiselect(
-    #             "Value",
-    #             options=df[filter_param].unique(),
-    #             key=f"{filter_id}_value",
-    #             label_visibility="collapsed",
-    #         )
-    #     case FilterType.NUMERIC:
-    #         filter_value = filter_cols[2].number_input(
-    #             "Value",
-    #             key=f"{filter_id}_value",
-    #             label_visibility="collapsed",
-    #             min_value=df[filter_param].min(),
-    #             max_value=df[filter_param].max(),
-    #         )
-    #     case FilterType.DATETIME:
-    #         filter_value = filter_cols[2].date_input(
-    #             "Value",
-    #             key=f"{filter_id}_value",
-    #             label_visibility="collapsed",
-    #             min_value=df[filter_param].min(),
-    #             max_value=df[filter_param].max(),
-    #             value=df[filter_param].max(),
-    #         )
+    match operator_options:
+        case FilterType.CATEGORICAL:
+            filter_value = filter_cols[2].multiselect(
+                "Value",
+                options=df[filter_param].unique(),
+                key=f"{filter_id}_value",
+                label_visibility="collapsed",
+            )
+        case FilterType.NUMERIC:
+            filter_value = filter_cols[2].number_input(
+                "Value",
+                key=f"{filter_id}_value",
+                label_visibility="collapsed",
+                min_value=df[filter_param].min(),
+                max_value=df[filter_param].max(),
+            )
+        case FilterType.DATETIME:
+            filter_value = filter_cols[2].date_input(
+                "Value",
+                key=f"{filter_id}_value",
+                label_visibility="collapsed",
+                min_value=df[filter_param].min(),
+                max_value=df[filter_param].max(),
+                value=df[filter_param].min(),
+            )
 
     filter_cols[3].button(
         "🗑",
@@ -301,11 +301,13 @@ def generate_filter(filter_id, df):
     )
 
     return {
+        "id": filter_id,
         "param": filter_param,
         "operator": filter_operator,
         "value": pd.to_datetime(filter_value)
         if operator_options == FilterType.DATETIME
         else filter_value,
+        "filter_cols": filter_cols,
     }
 
 
@@ -320,40 +322,40 @@ def filter_df(df: pd.DataFrame) -> pd.DataFrame:
         if isinstance(value, list) and not value:
             continue
 
-        if operator == "is in":
-            df = df[df[param].isin(value)]
-        elif operator == "is not in":
-            df = df[~df[param].isin(value)]
-        elif operator == "==" or operator == "on":
-            df = df[(df[param] == value)]
-        elif operator == "!=":
-            df = df[df[param] != value]
-        elif operator == ">":
-            df = df[df[param] > value]
-        elif operator == ">=" or operator == "since":
-            df = df[df[param] >= value]
-        elif operator == "<":
-            df = df[df[param] < value]
-        elif operator == "<=" or operator == "until":
-            df = df[df[param] <= value]
+        # if operator == "is in":
+        #     df = df[df[param].isin(value)]
+        # elif operator == "is not in":
+        #     df = df[~df[param].isin(value)]
+        # elif operator == "==" or operator == "on":
+        #     df = df[(df[param] == value)]
+        # elif operator == "!=":
+        #     df = df[df[param] != value]
+        # elif operator == ">":
+        #     df = df[df[param] > value]
+        # elif operator == ">=" or operator == "since":
+        #     df = df[df[param] >= value]
+        # elif operator == "<":
+        #     df = df[df[param] < value]
+        # elif operator == "<=" or operator == "until":
+        #     df = df[df[param] <= value]
 
-        # match operator:
-        #     case "is in" if value:
-        #         df = df[df[param].isin(value)]
-        #     case "is not in" if value:
-        #         df = df[~df[param].isin(value)]
-        #     case "==":
-        #         df = df[df[param] == value]
-        #     case "!=":
-        #         df = df[df[param] != value]
-        #     case ">":
-        #         df = df[df[param] > value]
-        #     case ">=" | "since":
-        #         df = df[df[param] >= value]
-        #     case "<":
-        #         df = df[df[param] < value]
-        #     case "<=" | "until":
-        #         df = df[df[param] <= value]
+        match operator:
+            case "is in":
+                df = df[df[param].isin(value)]
+            case "is not in":
+                df = df[~df[param].isin(value)]
+            case "==":
+                df = df[df[param] == value]
+            case "!=":
+                df = df[df[param] != value]
+            case ">":
+                df = df[df[param] > value]
+            case ">=" | "since":
+                df = df[df[param] >= value]
+            case "<":
+                df = df[df[param] < value]
+            case "<=" | "until":
+                df = df[df[param] <= value]
 
     return df
 
@@ -365,9 +367,10 @@ df = import_df("data/pr.pickle")
 for map_col in ["Sub tasks", "Defects"]:
     df[map_col] = df[map_col].map(len)
 
-for filter_id in st.session_state.filters:
-    filter_data = generate_filter(filter_id, df)
-    filter_collection.append(filter_data)
+if hasattr(st.session_state, "filters"):
+    for filter_id in st.session_state.filters:
+        filter_data = generate_filter(filter_id, df)
+        filter_collection.append(filter_data)
 
 st.markdown("### Graph")
 monthly_issues_plot = make_monthly_issues_plot(filter_df(df))
@@ -377,7 +380,3 @@ if monthly_issues_plot:
 
 st.markdown("### Data Preview")
 st.dataframe(filter_df(df))
-
-# for filter_id in st.session_state.filters:
-#     filter_data = generate_filter(filter_id, df)
-#     filter_collection.append(filter_data)

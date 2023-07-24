@@ -21,14 +21,21 @@ for map_col in ["Sub tasks", "Defects"]:
 data = DataFilterer(df)
 
 st.title("Monthly Issues")
-st.button("＋ Filter", on_click=fm.add_filter)
 
+st.sidebar.info(
+    """
+"Started" calculated from the date that the Jira ticket was moved away from the "Open" status.
+"""
+)
+
+st.button("＋ Filter", on_click=fm.add_filter)
 if st.session_state["filters"]:
     st.subheader("Filters")
 for filter_id in st.session_state["filters"]:
     filter_data = fm.generate_filter(filter_id, df)
     filter_collection.append(filter_data)
 data.filter_data(filter_collection)
+
 
 st.subheader("Graph")
 monthly_issues_plot = PlotManager.make_monthly_issues_plot(data)
@@ -38,10 +45,3 @@ if monthly_issues_plot:
 
 st.subheader("Data Preview")
 st.dataframe(data.filtered_data, use_container_width=True)
-
-
-st.sidebar.info(
-    """
-"Started" calculated from the date that the Jira ticket was moved away from the "Open" status.
-"""
-)

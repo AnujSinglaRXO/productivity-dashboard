@@ -18,9 +18,15 @@ fm = FilterManager(st.session_state)
 df = FileManager.import_df("data/pr.pickle")
 data = DataFilterer(df)
 
-st.title("Performance Bar Graph")
-st.button("＋ Filter", on_click=fm.add_filter)
+st.title("Performance: Defects Caused")
 
+st.sidebar.info(
+    """
+"Defects Discovered" is calculated from QA testing of the stories/tasks by each repository/user.
+"""
+)
+
+st.button("＋ Filter", on_click=fm.add_filter)
 if st.session_state["filters"]:
     st.subheader("Filters")
 for filter_id in st.session_state["filters"]:
@@ -29,24 +35,13 @@ for filter_id in st.session_state["filters"]:
 data.filter_data(filter_collection)
 
 
-st.subheader("Column")
-color_column = st.selectbox(
-    "Column", ("Repository", "User"), label_visibility="collapsed"
-)
+st.subheader("Parameter")
+param = st.selectbox("Parameter", ("Repository", "User"), label_visibility="collapsed")
 
 
 st.subheader("Graph")
-st.plotly_chart(
-    PlotManager.make_performance_bar(data, color_column), use_container_width=True
-)
+st.plotly_chart(PlotManager.make_performance_bar(data, param), use_container_width=True)
 
 
 st.subheader("Data Preview")
 st.dataframe(data.filtered_data, use_container_width=True)
-
-
-st.sidebar.info(
-    """
-"Defects Discovered" is calculated from the number of defects found when QA testing "Stories & Tasks Wored On" by each repository/user.
-"""
-)

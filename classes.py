@@ -67,6 +67,19 @@ class DataFilterer:
 
         return df
 
+    def get_monthly_df(self) -> pd.DataFrame:
+        monthly_df = self.filtered_data[(self.filtered_data["Started"].notnull())]
+        monthly_df = monthly_df[["Issue Type", "Started"]].reset_index(drop=True)
+        monthly_df["Month"] = monthly_df["Started"].apply(lambda x: x.strftime("%Y-%m"))
+        monthly_df = (
+            monthly_df.groupby(["Month", "Issue Type"]).size().reset_index(name="Count")
+        )
+        monthly_df = monthly_df.pivot(
+            index="Month", columns="Issue Type", values="Count"
+        ).fillna(0)
+
+        return monthly_df
+
     def get_performance_df(self, col: str) -> pd.DataFrame:
         col_log = {}
         for key in [col, "Stories & Tasks Worked On", "Defects Discovered"]:
@@ -232,19 +245,7 @@ class PlotManager:
     @staticmethod
     def make_monthly_issues_plot(data: DataFilterer) -> go.Figure:
         try:
-            plot_data = data.filtered_data[(data.filtered_data["Started"].notnull())]
-            plot_data = plot_data[["Issue Type", "Started"]].reset_index(drop=True)
-            plot_data["Month"] = plot_data["Started"].apply(
-                lambda x: x.strftime("%Y-%m")
-            )
-            plot_data = (
-                plot_data.groupby(["Month", "Issue Type"])
-                .size()
-                .reset_index(name="Count")
-            )
-            plot_data = plot_data.pivot(
-                index="Month", columns="Issue Type", values="Count"
-            ).fillna(0)
+            plot_data = data.get_monthly_df()
 
             fig = go.Figure()
 

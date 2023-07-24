@@ -35,7 +35,7 @@ for filter_id in st.session_state["filters"]:
     filter_data = fm.generate_filter(filter_id, df)
     filter_collection.append(filter_data)
 data.filter_data(filter_collection)
-
+data.get_monthly_df()
 
 st.subheader("Graph")
 monthly_issues_plot = PlotManager.make_monthly_issues_plot(data)
@@ -44,4 +44,4 @@ if monthly_issues_plot:
 
 
 st.subheader("Data Preview")
-st.dataframe(data.filtered_data, use_container_width=True)
+st.dataframe(data.get_monthly_df(), use_container_width=True)

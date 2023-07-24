@@ -38,3 +38,10 @@ if monthly_issues_plot:
 
 st.subheader("Data Preview")
 st.dataframe(data.filtered_data, use_container_width=True)
+
+
+st.sidebar.info(
+    """
+"Started" calculated from the date that the Jira ticket was moved away from the "Open" status.
+"""
+)

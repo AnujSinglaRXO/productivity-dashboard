@@ -40,10 +40,6 @@ param2_include = param2_cols[1].multiselect(
 
 data.group_df(param1_value, param2_value, param1_include, param2_include)
 
-# chart_type = st.sidebar.selectbox(
-#     "Choose Chart Type:", ("Donut", "Bar"), key="chart_type"
-# )
-
 st.write("<br>", unsafe_allow_html=True)
 graph_cols = st.columns(5)
 graph_cols[0].subheader("Graph")
@@ -59,7 +55,7 @@ else:
     if chart_type == "Donut":
         st.plotly_chart(
             PlotManager.make_donut(
-                data,
+                data=data,
                 title=f"{param1_value} - {param2_value} Totals",
             ),
             use_container_width=True,
@@ -67,7 +63,7 @@ else:
     elif chart_type == "Bar":
         st.plotly_chart(
             PlotManager.make_stacked_bar(
-                data,
+                data=data,
                 title=f"{param1_value} - {param2_value}",
             ),
             use_container_width=True,

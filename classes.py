@@ -58,6 +58,10 @@ class DataFilterer:
                     df = df[df[param] >= value]
                 case "<":
                     df = df[df[param] < value]
+                case "<=" | "until":
+                    df = df[df[param] <= value]
+                case "on":
+                    df = df[df[param].dt.date == value.date()]
 
         self.filtered_data = df
 
@@ -150,12 +154,17 @@ class FilterManager:
     def remove_filter(self, filter_id: str):
         self.filters.remove(filter_id)
 
-    def generate_filter(self, filter_id: str, df: pd.DataFrame):
+    def generate_filter(
+        self, filter_id: str, df: pd.DataFrame, exclude_cols: list = []
+    ):
         filter_cols = st.columns((2, 1, 3, 1))
 
+        param_options = df.columns.tolist()
+        for col in exclude_cols:
+            param_options.remove(col)
         filter_param = filter_cols[0].selectbox(
             "Parameter",
-            options=df.columns,
+            options=param_options,
             key=f"{filter_id}_param",
             label_visibility="collapsed",
         )
@@ -283,7 +292,7 @@ class PlotManager:
 
             fig.update_layout(
                 title="Issues Worked On by Month",
-                xaxis_title="Month Started (Moved Away from 'Open' Status)",
+                xaxis_title="Month Started",
                 yaxis_title="Count",
                 xaxis_tickangle=0,
                 legend_title="Issue Type",

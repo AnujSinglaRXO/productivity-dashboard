@@ -24,14 +24,14 @@ st.button("＋ Filter", on_click=fm.add_filter)
 if st.session_state["filters"]:
     st.subheader("Filters")
 for filter_id in st.session_state["filters"]:
-    filter_data = fm.generate_filter(filter_id, df)
+    filter_data = fm.generate_filter(filter_id, df, ["Defects", "Sub tasks"])
     filter_collection.append(filter_data)
 data.filter_data(filter_collection)
 
 
-st.subheader("Color Column")
+st.subheader("Column")
 color_column = st.selectbox(
-    "Color Column", ("Repository", "User"), label_visibility="collapsed"
+    "Column", ("Repository", "User"), label_visibility="collapsed"
 )
 
 
@@ -43,3 +43,10 @@ st.plotly_chart(
 
 st.subheader("Data Preview")
 st.dataframe(data.filtered_data, use_container_width=True)
+
+
+st.sidebar.info(
+    """
+"Defects Discovered" is calculated from the number of defects found when QA testing "Stories & Tasks Wored On" by each repository/user.
+"""
+)

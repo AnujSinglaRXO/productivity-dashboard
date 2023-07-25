@@ -80,7 +80,7 @@ class DataFilterer:
 
         return monthly_df
 
-    def get_performance_df(self, col: str) -> pd.DataFrame:
+    def get_performance_df(self, col: str, inplace: bool = True) -> pd.DataFrame:
         col_log = {}
         for key in [col, "Stories & Tasks Worked On", "Defects Discovered"]:
             col_log[key] = []
@@ -117,7 +117,8 @@ class DataFilterer:
             .reset_index(drop=True)
         )
 
-        self.filtered_data = col_df
+        if inplace:
+            self.filtered_data = col_df
         return col_df
 
     def group_df(
@@ -345,10 +346,20 @@ class PlotManager:
 
     @staticmethod
     def make_performance_bar(
-        data: DataFilterer, col: str, title: str = None
+        data: DataFilterer, col: str, rel: tuple = None, title: str = None
     ) -> go.Figure:
         fig = go.Figure()
         performance_df = data.get_performance_df(col)
+
+        if rel:
+            match rel[0]:
+                case "with at least":
+                    performance_df = performance_df[performance_df[rel[2]] >= rel[1]]
+                case "with at most":
+                    performance_df = performance_df[performance_df[rel[2]] <= rel[1]]
+                case _:
+                    raise ValueError("Invalid relationship")
+
         fig.add_trace(
             go.Bar(
                 x=performance_df[col],

@@ -36,11 +36,39 @@ data.filter_data(filter_collection)
 
 
 st.subheader("Parameter")
-param = st.selectbox("Parameter", ("Repository", "User"), label_visibility="collapsed")
+param_cols = st.columns(4)
+param_value = param_cols[0].selectbox(
+    "Parameter", ("Repository", "User"), label_visibility="collapsed", key="param1"
+)
+param_rel = param_cols[1].selectbox(
+    "Relationship",
+    ("with at least", "with at most"),
+    label_visibility="collapsed",
+    key="param2",
+)
+param_rel_var = param_cols[3].selectbox(
+    "Variable",
+    ("Stories & Tasks Worked On", "Defects Discovered"),
+    label_visibility="collapsed",
+    key="param4",
+)
+param_rel_value = param_cols[2].number_input(
+    "Value",
+    min_value=1,
+    max_value=data.get_performance_df(param_value, inplace=False)[param_rel_var].max(),
+    value=1,
+    label_visibility="collapsed",
+    key="param3",
+)
 
 
 st.subheader("Graph")
-st.plotly_chart(PlotManager.make_performance_bar(data, param), use_container_width=True)
+st.plotly_chart(
+    PlotManager.make_performance_bar(
+        data, param_value, (param_rel, param_rel_value, param_rel_var)
+    ),
+    use_container_width=True,
+)
 
 
 st.subheader("Data Preview")
